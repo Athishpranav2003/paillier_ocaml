@@ -17,11 +17,12 @@ let gen_secret_key p q =
 let gen_public_key (priv_key:private_key) =
   {g = priv_key.g; n = priv_key.n; n2 = priv_key.n2}
 
-let encrypt (public_key:public_key) msg =
+let encrypt (public_key:public_key) msg ?r () =
   let get_r () = Mirage_crypto_pk.Z_extra.gen public_key.n in
   let check_r r =  Z.((r >= zero) && (r < public_key.n) && gcd r public_key.n = one) in
-  let r = 
-    let r = get_r () in if check_r r then r else get_r () in
+  let r = match r with
+    | Some r -> if check_r r then r else failwith "r is not valid"
+    | None -> let r = (Mirage_crypto_pk.Z_extra.gen Z.(~$2)) in if check_r r then r else get_r () in
   let gm = Z.powm public_key.g msg public_key.n2 in
   let rn = Z.powm r public_key.n public_key.n2 in
   Z.(rem (mul gm rn) public_key.n2)

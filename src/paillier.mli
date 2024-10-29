@@ -6,7 +6,7 @@ val gen_secret_key : Z.t -> Z.t -> private_key
 
 val gen_public_key : private_key -> public_key
 
-val encrypt : public_key -> Z.t -> Z.t 
+val encrypt : public_key -> Z.t -> ?r:Z.t -> unit -> Z.t 
 
 val decrypt : private_key -> Z.t -> Z.t
 
